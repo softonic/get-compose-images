@@ -1,0 +1,33 @@
+version: "3.7"
+
+networks:
+  intranet:
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    image: my.registry.io/magic-api/nginx:${NGINX_VERSION:-1.0.3}
+
+  php-fpm:
+    build:
+      context: .
+      dockerfile: docker/php-fpm/Dockerfile
+    command: php-fpm
+    image: my.registry.io/magic-api/php-fpm:${VERSION:-latest}
+
+  redis:
+    image: redis:5
+    command: [
+      "--maxmemory 100mb",
+      "--maxmemory-policy allkeys-lru"
+    ]
+    networks:
+    - intranet
+
+  docs:
+    build:
+      context: .
+      dockerfile: docker/docs/Dockerfile
+    image: my.registry.io/magic-api/docs:${VERSION:-latest}
